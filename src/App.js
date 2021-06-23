@@ -1,44 +1,43 @@
-import React, { Component } from 'react';
+import React from 'react';
 
-class App extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      items: [],
-      isLoaded: false,
+export default class FetchRandomser extends React.Component {
+
+    state ={
+      loading: true,
+      people: []
+    };
+
+    async componentDidMount() {
+      const url = "http://api.randomuser.me/?results=20";
+      const response = await fetch(url)
+    
+      const data = await response.json();
+      this.setState({people: data.results, loading: false});
+      console.log(data.results[0]);
+
     }
-  }
 
-  componentDidMount() {
-    fetch('https://jsonplaceholder.typicode.com/users')
-      .then(res => res.json())
-      .then(json => {
-        this.setState({
-          isLoaded: true,
-          items: json,
-        })
-      });
-  }
-  render() {
-    const { isLoaded, items } = this.state;
-
-    if (!isLoaded) {
+  render(){
+    if (this.state.loading){
       return <div>Loading...</div>;
-    } else {
-
-      return (
-      <div className='App'>
-              <ul>
-                {items.map(item => (
-                    <li key={item.id}>
-                     Name: {item.name} | Email:{item.email}
-                    </li>
-                ))};
-              </ul>
-            </div>
-      );
     }
+    if (!this.state.people.length) {
+      return <div>Didn't get any personnel</div>
+    }
+    return (
+         <div>
+           <ul>
+           {this.state.people.map(person => (             
+             <li key={person.login.uuid}>
+           <img src={person.picture.medium} /> {person.name.title}  {person.name.first} {person.name.last}    email: {person.email}    Cell: {person.cell}
+            </li>
+           ))};
+           </ul>
+          </div>           
+         );     
   }
 }
 
-export default App;
+
+
+
